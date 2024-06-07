@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Surdo v2 Telegram Mini Apps Vanilla JS Sample App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        input,textarea,select {
+            width: 100%;
+        }
+        label{
+            display: block;
+            padding-top: 10PX;
+        }
+        body {
+            --bg-color: var(--tg-theme-bg-color);
+            font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 48px 24px;
+            padding: 0;
+            color-scheme: var(--tg-color-scheme);
+        }
+        a {
+            color: var(--tg-theme-link-color);
+        }
+    </style>
+    
+    <!-- Eruda is console for mobile browsers -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+
+    <script>
+        function fromBase64(base64Str) {
+            const utf8String = atob(base64Str);
+            const decodedString = decodeURIComponent(utf8String);
+            return decodedString;
+        }
+        const base64encodedParams=new URL(location.href).searchParams.get('botParams');
+        if(base64encodedParams)
+            window.botParams=JSON.parse(fromBase64(base64encodedParams));
+        else window.botParams={}
+    </script>
+</head>
+<body>
+    <main>
+        <div align="center">
+            <a href="https://ton.org/"><img width="48" src="./assets/tapps.png" alt="logo of telegram web apps"></a>
+        </div>
+        
+        <div id="user-info" style="display: none;">
+            <h1>Данные пользователя</h1>
+            <p>Пожалуста, укажите ваши данные ниже.</p>
+            <form id="user-info-form">
+                <input type="hidden" name="target" value="user"/>
+
+                <div>
+                    <label for="name">Фамилия Имя Отчество*</label>
+                    <input id="input_name" type="text" name="name"/>
+                </div>
+        
+                <div>
+                    <label for="gender">Пол</label>
+                    <select id="input_gender" name="gender">
+                        <option value=""></option>
+                        <option value="female">Женский</option>
+                        <option value="male">Мужской</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="disability">Группа инвалидности по слуху</label>
+                    <select id="input_disability" name="disability">
+                        <option value="">Нет</option>
+                        <option value="III">III</option>
+                        <option value="II">II</option>
+                        <option value="I">I</option>
+                    </select>
+                </div>
+
+                <label for="birthdate">Дата рождения</label>
+                <div style="display:flex;">
+                    <input style="flex-grow: 1; width: 33%;" id="input_birthdate_day" type="text" name="birthdate_day" maxlength="2" placeholder="ДД"/>
+                    <select style="flex-grow: 1; width: 33%;" id="input_birthdate_month" name="birthdate_month">
+                        <option value="0"></option>
+                        <option value="1">Января</option>
+                        <option value="2">Февраля</option>
+                        <option value="3">Марта</option>
+                        <option value="4">Апреля</option>
+                        <option value="5">Мая</option>
+                        <option value="6">Июня</option>
+                        <option value="7">Июля</option>
+                        <option value="8">Августа</option>
+                        <option value="9">Сентября</option>
+                        <option value="10">Октября</option>
+                        <option value="11">Ноября</option>
+                        <option value="12">Декабря</option>
+                    </select>
+                    <input style="flex-grow: 1; width: 33%;" id="input_birthdate_year" type="text" name="birthdate_year" maxlength="4" placeholder="ГГГГ"/>
+                </div>
+
+                <div>
+                    <label for="phone">Телефон</label>
+                    <input id="input_phone" type="text" name="phone"/>
+                </div>
+
+                <div>
+                    <input type="hidden" name="request"/>
+                </div>
+
+            </form>
+        </div>
+        
+    </main>
+    
+    <script>
+        Telegram.WebApp.ready();
+
+        // Event occurs whenever theme settings are changed in the user's Telegram app (including switching to night mode).
+        Telegram.WebApp.onEvent('themeChanged', function() {
+            document.documentElement.className = Telegram.WebApp.colorScheme;
+        });
+
+        if(botParams.target=='user'){
+            //Show target block
+            document.getElementById("user-info").style.display="block";
+
+            //loat data to form if user object is presetn
+            if(botParams.user){
+                if(botParams.user.name)
+                    document.querySelector("#user-info-form #input_name").value=botParams.user.name;
+                if(botParams.user.phone)
+                    document.querySelector("#user-info-form #input_phone").value=botParams.user.phone;
+                else {
+                    Telegram.WebApp.requestContact((i,e)=>{
+                        if(i)
+                            document.querySelector("#user-info-form #input_phone").value=e.responseUnsafe.contact.phone_number;
+                    })
+                }
+                if(botParams.user.disability)
+                    document.querySelector("#user-info-form #input_disability").value=botParams.user.disability;
+                if(botParams.user.gender)
+                    document.querySelector("#user-info-form #input_gender").value=botParams.user.gender;
+                if(botParams.user.birthdate){
+                    const bd=botParams.user.birthdate.split(".");
+                    document.querySelector("#user-info-form #input_birthdate_year").value=bd[2];
+                    document.querySelector("#user-info-form #input_birthdate_month").value=bd[1];
+                    document.querySelector("#user-info-form #input_birthdate_day").value=bd[0];
+                }
+            }else{//request contact info anyway
+                Telegram.WebApp.requestContact((i,e)=>{
+                        if(i)
+                            document.querySelector("#user-info-form #input_phone").value=e.responseUnsafe.contact.phone_number;
+                    })
+            }
+            
+                
+
+            Telegram.WebApp.MainButton.setParams({
+                text: 'СОХРАНИТЬ'
+            });
+            
+            Telegram.WebApp.MainButton.onClick(function () {
+                var form=document.getElementById("user-info-form");
+                var fd=new FormData(form);
+                var json=JSON.stringify(Object.fromEntries(fd));
+                Telegram.WebApp.sendData(json);
+            });	
+        }
+        
+        Telegram.WebApp.MainButton.show();
+
+        // Function to call showPopup API
+        function showPopup() {
+            Telegram.WebApp.showPopup({
+                title: 'Title',
+                message: 'Some message',
+                buttons: [
+                    {id: 'link', type: 'default', text: 'Open ton.org'},
+                    {type: 'cancel'},
+                ]
+            }, function(btn) {
+                if (btn === 'link') {
+                    Telegram.WebApp.openLink('https://ton.org/');
+                }
+            });
+        };
+
+        // Function to toggle main TWA button
+        function toggleMainButton() {
+            if (Telegram.WebApp.MainButton.isVisible) {
+                Telegram.WebApp.MainButton.hide();
+            } else {
+                Telegram.WebApp.MainButton.show();
+            }
+        };
+
+        Telegram.WebApp.setHeaderColor('secondary_bg_color');
+
+        Telegram.WebApp.onEvent('themeChanged', function() {
+            document.body.setAttribute('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+        });
+
+    </script>
+
+    
+</body>
+</html>
