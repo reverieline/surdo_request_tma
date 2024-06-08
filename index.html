@@ -244,6 +244,7 @@
         function updateRequestState(obj){
             for (const [key, value] of Object.entries(obj)) {
                 const e=document.querySelector(`input[name="${key}"]`);
+                if(!e)continue;
                 if(e.type=="checkbox")
                     e.checked=value;
                 else e.value=value;
