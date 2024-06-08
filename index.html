@@ -180,7 +180,15 @@
                 var rObject={}
                 var inputs=document.querySelectorAll(".request input");
                 inputs.forEach(input => {
-                    rObject[input.name] = input.value;
+                    if (input.type === 'checkbox') {
+                        rObject[input.name] = input.checked ? /*input.value*/'true' : 'false';
+                    } else if (input.type === 'radio') {
+                        if (input.checked) {
+                            rObject[input.name] = input.value;
+                        }
+                    } else {
+                        rObject[input.name] = input.value;
+                    }
                 });
 
                 uObject['request']=rObject;
