@@ -7,6 +7,9 @@
     <title>Surdo v2 Telegram Mini Apps Vanilla JS Sample App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        .request * {
+            width: auto;
+        }
         input,textarea,select {
             width: 100%;
         }
@@ -111,6 +114,13 @@
                 </div>
 
             </form>
+
+        </div>
+
+        <!--- REQUEST  -->
+        <div class="request">
+            <label><input type="checkbox" name="0_chem" value="химия">Химия</label>
+            <label><input type="checkbox" name="0_med" value="медицина">Медицина</label>
         </div>
         
     </main>
@@ -123,7 +133,7 @@
             document.documentElement.className = Telegram.WebApp.colorScheme;
         });
 
-        if(botParams.target=='user'){
+        if(true /*botParams.target=='user'*/){
             //Show target block
             document.getElementById("user-info").style.display="block";
 
@@ -165,7 +175,17 @@
             Telegram.WebApp.MainButton.onClick(function () {
                 var form=document.getElementById("user-info-form");
                 var fd=new FormData(form);
-                var json=JSON.stringify(Object.fromEntries(fd));
+                var uObject=Object.fromEntries(fd);
+
+                var rObject={}
+                var inputs=document.querySelectorAll(".request input");
+                inputs.forEach(input => {
+                    rObject[input.name] = input.value;
+                });
+
+                uObject['request']=rObject;
+                var json=JSON.stringify(uObject);
+
                 Telegram.WebApp.sendData(json);
             });	
         }
