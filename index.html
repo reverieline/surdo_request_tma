@@ -165,6 +165,14 @@
                     document.querySelector("#user-info-form #input_birthdate_month").value=bd[1];
                     document.querySelector("#user-info-form #input_birthdate_day").value=bd[0];
                 }
+                if(botParams.user.request){
+                    for (const [key, value] of Object.entries(botParams.user.request)) {
+                        const e=document.querySelector(`input[name="${key}"]`);
+                        if(e.type=="checkbox")
+                            e.checked=value;
+                        else e.value=value;
+                    }
+                }
             }else{//request contact info anyway
                 Telegram.WebApp.requestContact((i,e)=>{
                         if(i)
@@ -187,7 +195,7 @@
                 var inputs=document.querySelectorAll(".request input");
                 inputs.forEach(input => {
                     if (input.type === 'checkbox') {
-                        rObject[input.name] = input.checked ? /*input.value*/'true' : 'false';
+                        rObject[input.name] = input.checked;// ? /*input.value*/'true' : 'false';
                     } else if (input.type === 'radio') {
                         if (input.checked) {
                             rObject[input.name] = input.value;
