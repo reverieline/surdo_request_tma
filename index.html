@@ -166,7 +166,7 @@
                     document.querySelector("#user-info-form #input_birthdate_day").value=bd[0];
                 }
                 if(botParams.user.request){
-                    updateRequestState(botParams.user.request);
+                    updateRequestState(JSON.parse(botParams.user.request));
                 }
             }else{//request contact info anyway
                 Telegram.WebApp.requestContact((i,e)=>{
