@@ -122,9 +122,9 @@
         <div class="request">
             <div>
                 <b>Химия</b>
-                <label><input type="checkbox" name="химия.стирка" value="химия.стирка">Стиральный порошок (гель)</label>
-                <label><input type="checkbox" name="химия.посуда" value="химия.посуда">Для мытья посуды</label>
-                <label><input type="text" name="химия.note" placeholder="примечание"></label>
+                <label><input type="checkbox" name="Химия: стиральный порошок">Стиральный порошок</label>
+                <label><input type="checkbox" name="Химия: для мытья посуды">Для мытья посуды</label>
+                <label><input type="text" name="Химия: примечание" placeholder="Примечание по химии"></label>
             </div>
             
         </div>
@@ -242,9 +242,7 @@
 
 
         function updateRequestState(obj){
-            console.log(obj);
             for (const [key, value] of Object.entries(obj)) {
-                console.log(`${key}:${value}`);
                 const e=document.querySelector(`input[name="${key}"]`);
                 if(e.type=="checkbox")
                     e.checked=value;
