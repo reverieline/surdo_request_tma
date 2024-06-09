@@ -10,7 +10,7 @@
         .request * {
             width: auto;
         }
-        .request input[type=text] {
+        .request input[type=text],textarea {
             width: 100%;
         }
         input,textarea,select {
@@ -220,6 +220,11 @@
                     }
                 });
 
+                var textareas=document.querySelectorAll(".request textarea");
+                textareas.forEach(textarea => {
+                    rObject[textarea.name] = textarea.value;
+                });
+
                 uObject['request']=rObject;
                 var json=JSON.stringify(uObject);
 
@@ -263,11 +268,20 @@
 
         function updateRequestState(obj){
             for (const [key, value] of Object.entries(obj)) {
-                const e=document.querySelector(`input[name="${key}"]`);
-                if(!e)continue;
-                if(e.type=="checkbox")
-                    e.checked=value;
-                else e.value=value;
+                const input=document.querySelector(`input[name="${key}"]`);
+                if(input){
+                    if(input.type=="checkbox")
+                        input.checked=value;
+                    else 
+                        input.value=value;
+                    continue;
+                }
+                
+                const textarea=document.querySelector(`textarea[name="${key}"]`);
+                if(textarea){
+                    textarea.value=value;
+                    continue;
+                }
             }
         }
     </script>
